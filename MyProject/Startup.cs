@@ -23,17 +23,16 @@ namespace MyProject
         {
             services.AddMvc();
 
-            var types = AppDomain.CurrentDomain.GetAssemblies()
+            var projectTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .ToList();
 
-            RegisterRepositories(services, types);
+            RegisterFromBaseType(services, typeof(IRepository), projectTypes);
         }
 
-        private void RegisterRepositories(IServiceCollection services, List<Type> types)
+        private void RegisterFromBaseType(IServiceCollection services, Type type, List<Type> allTypes)
         {
-            var interfaceT = typeof(IRepository);
-            foreach (var t in types.Where(x => interfaceT.IsAssignableFrom(x) && x != interfaceT))
+            foreach (var t in allTypes.Where(x => type.IsAssignableFrom(x) && x != type))
             {
                 services.AddTransient(t);
             }
